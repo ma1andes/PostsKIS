@@ -1,4 +1,5 @@
 import express, { Express, Request, Response, NextFunction } from "express";
+import cors from "cors";
 import postsRoutes from "./routes/postsRoutes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 
@@ -6,6 +7,19 @@ function createApp(): Express {
   const app = express();
 
   app.disable("x-powered-by");
+
+  const corsOptions = {
+    origin: process.env.CORS_ORIGIN || "*",
+    credentials: process.env.CORS_CREDENTIALS === "true" || false,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    exposedHeaders: ["Content-Range", "X-Content-Range"],
+    maxAge: process.env.CORS_MAX_AGE
+      ? parseInt(process.env.CORS_MAX_AGE)
+      : 86400,
+  };
+
+  app.use(cors(corsOptions));
 
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
